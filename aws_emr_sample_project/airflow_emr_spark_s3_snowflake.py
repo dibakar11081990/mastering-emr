@@ -115,18 +115,21 @@ with dag:
   python_callable=create_emr_cluster,
   dag=dag, 
   )
+
   ingest_layer = PythonOperator(
   task_id='ingest_layer',
   python_callable=add_step_emr,
   op_args=['{{ ti.xcom_pull("create_emr_cluster")["JobFlowId"]}}','s3://us-east-1.elasticmapreduce/libs/script-runner/script-runner.jar',[ 's3://irisseta/scripts/ingest.sh']],
   dag=dag, 
   )
+
   poll_step_layer = PythonOperator(
   task_id='poll_step_layer',
   python_callable=wait_for_step_to_complete,
   op_args=['{{ ti.xcom_pull("create_emr_cluster")["JobFlowId"]}}','{{ ti.xcom_pull("ingest_layer")}}'],
   dag=dag, 
   )
+
   transform_layer = PythonOperator(
   task_id='transform_layer',
   python_callable=add_step_emr,
@@ -136,18 +139,21 @@ with dag:
             's3://irisseta/scripts/transform.py']],
   dag=dag, 
   )
+
   poll_step_layer2 = PythonOperator(
   task_id='poll_step_layer2',
   python_callable=wait_for_step_to_complete,
   op_args=['{{ ti.xcom_pull("create_emr_cluster")["JobFlowId"]}}','{{ ti.xcom_pull("transform_layer")}}'],
   dag=dag, 
   )
+
   terminate_emr_cluster = PythonOperator(
   task_id='terminate_emr_cluster',
   python_callable=terminate_cluster,
   op_args=['{{ ti.xcom_pull("create_emr_cluster")["JobFlowId"]}}'],
   dag=dag, 
   )
+  
   snowflake_load=SnowflakeOperator(
 		task_id="snowflake_load",
 		sql="""ALTER EXTERNAL TABLE s3_to_snowflake.PUBLIC.Iris_dataset REFRESH""" ,
