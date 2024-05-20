@@ -1,4 +1,4 @@
-
+https://www.youtube.com/watch?v=hK4kPvJawv8
 
 sudo apt update
 sudo apt install -y python3-pip
