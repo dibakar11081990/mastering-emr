@@ -1,5 +1,4 @@
-from pyspark.sql.functions import year, \
-    month, dayofmonth
+from pyspark.sql.functions import year, month, dayofmonth
 
 
 def transform(df):
